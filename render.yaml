@@ -1,0 +1,16 @@
+services:
+  - type: web
+    name: pregasquad-manager
+    runtime: docker
+    plan: free
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: "8000"
+      - key: DB_DIALECT
+        value: mysql
+      - key: DATABASE_URL
+        sync: false
+      - key: SESSION_SECRET
+        generateValue: true
