@@ -160,7 +160,7 @@ export default function StaffPerformance() {
     ),
   }), [filteredStaffStats]);
 
-  const COLORS = ["#d63384", "#20c997", "#0d6efd", "#ffc107", "#6610f2"];
+  const COLORS = ["#f97316", "#20c997", "#0d6efd", "#ffc107", "#6610f2"];
 
   const chartData = useMemo(() => filteredStaffStats.map((s) => ({
     name: s.staffName,
@@ -305,8 +305,8 @@ export default function StaffPerformance() {
             <Card>
               <CardContent className="pt-6">
                 <div className="flex items-center gap-3">
-                  <div className="p-2 bg-pink-100 rounded-lg">
-                    <Users className="w-5 h-5 text-pink-600" />
+                  <div className="p-2 bg-orange-100 rounded-lg">
+                    <Users className="w-5 h-5 text-orange-600" />
                   </div>
                   <div>
                     <p className="text-sm text-muted-foreground">{t("staffPerformance.staffCount")}</p>
@@ -331,8 +331,8 @@ export default function StaffPerformance() {
             <Card>
               <CardContent className="pt-6">
                 <div className="flex items-center gap-3">
-                  <div className="p-2 bg-pink-100 rounded-lg">
-                    <Calendar className="w-5 h-5 text-pink-600" />
+                  <div className="p-2 bg-orange-100 rounded-lg">
+                    <Calendar className="w-5 h-5 text-orange-600" />
                   </div>
                   <div>
                     <p className="text-sm text-muted-foreground">{t("staffPerformance.totalAppointments")}</p>
@@ -368,7 +368,7 @@ export default function StaffPerformance() {
                     <XAxis dataKey="name" />
                     <YAxis />
                     <Tooltip formatter={(value: number) => `${value} ${t("common.currency")}`} />
-                    <Bar dataKey="revenue" fill="#d63384" name={t("staffPerformance.revenue")} />
+                    <Bar dataKey="revenue" fill="#f97316" name={t("staffPerformance.revenue")} />
                     <Bar dataKey="commission" fill="#20c997" name={t("staffPerformance.commission")} />
                   </BarChart>
                 </ResponsiveContainer>
@@ -433,7 +433,7 @@ export default function StaffPerformance() {
                         </div>
                         <div className="flex justify-between">
                           <span className="text-muted-foreground">{t("staffPerformance.commission")}</span>
-                          <span className="font-bold text-pink-600">{formatCurrency(stats.totalCommission)} {t("common.currency")}</span>
+                          <span className="font-bold text-orange-600">{formatCurrency(stats.totalCommission)} {t("common.currency")}</span>
                         </div>
                         <div className="flex justify-between">
                           <span className="text-muted-foreground">{t("staffPerformance.avgPerAppointment")}</span>

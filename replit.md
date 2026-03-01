@@ -56,7 +56,7 @@ Beauty Salon Appointment Management System built with React + Express + PostgreS
 - **Screen Wake Lock**: `useWakeLock` hook (`client/src/hooks/useWakeLock.ts`) keeps screen awake on Planning page (Safari 18.4+)
 - **PWA install banner**: `PWAInstallBanner` component detects iOS Safari (including iPad) and shows "Add to Home Screen" instructions; dismissible for 30 days
 - **Orientation**: `any` - supports both portrait and landscape (important for iPad)
-- **Theme color**: `#f9a8d4` (baby pink matching app theme)
+- **Theme color**: `#f97316` (orange matching app theme)
 
 ## Recent Changes
 - 2026-02-11: Redesigned Dashboard (Home.tsx) with premium SaaS fintech layout - glassmorphism 2x2 summary cards (Revenue, Appointments, Paid, Unpaid), financial overview section with dominant net profit display, Stripe-style employee performance list with avatar/commission/appointment stats, closing day checklist card, low stock alerts; full RTL Arabic support; iPhone-optimized mobile layout

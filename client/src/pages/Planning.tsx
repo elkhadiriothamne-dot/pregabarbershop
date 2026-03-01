@@ -1829,7 +1829,7 @@ export default function Planning() {
                       <span className={cn(
                         "px-2 py-0.5 rounded-full text-[10px] font-bold shrink-0",
                         entry.status === "waiting" && "bg-sky-100 text-sky-700",
-                        entry.status === "notified" && "bg-pink-100 text-pink-700",
+                        entry.status === "notified" && "bg-orange-100 text-orange-700",
                         entry.status === "booked" && "bg-green-100 text-green-700",
                         entry.status === "expired" && "bg-gray-100 text-gray-500"
                       )}>
@@ -2054,19 +2054,19 @@ export default function Planning() {
                       <div className="absolute -inset-1 rounded-full liquid-gradient blur-lg opacity-40 animate-pulse" />
                     </div>
                   </div>
-                  {/* Thick glowing line - Baby pink gradient */}
+                  {/* Thick glowing line - Orange gradient */}
                   <div className="flex-1 relative">
                     <div 
                       className="h-1 rounded-full shadow-lg"
                       style={{
-                        background: 'linear-gradient(to right, hsl(340, 82%, 55%), hsl(340, 90%, 65%), hsl(350, 80%, 70%))',
-                        boxShadow: '0 0 16px rgba(236, 72, 153, 0.5), 0 0 32px rgba(236, 72, 153, 0.25)',
+                        background: 'linear-gradient(to right, hsl(25, 95%, 50%), hsl(25, 95%, 55%), hsl(20, 90%, 58%))',
+                        boxShadow: '0 0 16px rgba(249, 115, 22, 0.5), 0 0 32px rgba(249, 115, 22, 0.25)',
                       }}
                     />
                     <div 
                       className="absolute inset-0 h-1 rounded-full opacity-50 blur-sm"
                       style={{
-                        background: 'linear-gradient(to right, hsl(340, 82%, 55%), hsl(340, 90%, 65%))',
+                        background: 'linear-gradient(to right, hsl(25, 95%, 50%), hsl(25, 95%, 55%))',
                       }}
                     />
                   </div>
@@ -2273,7 +2273,7 @@ export default function Planning() {
                 <div className="liquid-glass-shimmer absolute inset-0" />
                 <div className="liquid-glass-reflection absolute inset-0" />
                 <div className="relative z-10 flex items-center gap-2">
-                  <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-pink-400 to-rose-400 flex items-center justify-center shadow-md shrink-0">
+                  <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-orange-400 to-orange-400 flex items-center justify-center shadow-md shrink-0">
                     <Sparkles className="w-3.5 h-3.5 text-white" />
                   </div>
                   <span className="text-sm font-semibold text-slate-800 dark:text-white truncate">
@@ -2299,7 +2299,7 @@ export default function Planning() {
                       placeholder="0"
                       onClick={(e) => e.stopPropagation()}
                       onFocus={(e) => e.target.select()}
-                      className="w-20 h-9 text-lg font-bold border border-white/30 dark:border-white/10 bg-white/60 dark:bg-slate-800/60 backdrop-blur-sm rounded-lg text-center focus:ring-2 focus:ring-pink-400/50 focus:outline-none"
+                      className="w-20 h-9 text-lg font-bold border border-white/30 dark:border-white/10 bg-white/60 dark:bg-slate-800/60 backdrop-blur-sm rounded-lg text-center focus:ring-2 focus:ring-orange-400/50 focus:outline-none"
                       style={{ WebkitAppearance: 'none', MozAppearance: 'textfield' }}
                     />
                     <span className="text-xs font-bold text-emerald-600 dark:text-emerald-400">DH</span>
