@@ -333,46 +333,6 @@ export default function Planning() {
   const [dragOverSlot, setDragOverSlot] = useState<{staff: string, time: string} | null>(null);
   const pageRef = useRef<HTMLDivElement>(null);
   
-  // Swipe gesture state for mobile date navigation
-  const touchStartX = useRef<number | null>(null);
-  const touchStartY = useRef<number | null>(null);
-  const swipeThreshold = 80; // minimum px to trigger swipe
-  
-  const handleTouchStart = useCallback((e: React.TouchEvent) => {
-    touchStartX.current = e.touches[0].clientX;
-    touchStartY.current = e.touches[0].clientY;
-  }, []);
-  
-  const handleTouchEnd = useCallback((e: React.TouchEvent) => {
-    if (touchStartX.current === null || touchStartY.current === null) return;
-    
-    const touchEndX = e.changedTouches[0].clientX;
-    const touchEndY = e.changedTouches[0].clientY;
-    const deltaX = touchEndX - touchStartX.current;
-    const deltaY = touchEndY - touchStartY.current;
-    
-    // Only trigger if horizontal swipe is greater than vertical (avoid scroll conflicts)
-    if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > swipeThreshold) {
-      if (isRtl) {
-        // RTL: swipe left = previous day, swipe right = next day
-        if (deltaX < 0) {
-          setDate(d => addDays(d, -1));
-        } else {
-          setDate(d => addDays(d, 1));
-        }
-      } else {
-        // LTR: swipe right = previous day, swipe left = next day  
-        if (deltaX > 0) {
-          setDate(d => addDays(d, -1));
-        } else {
-          setDate(d => addDays(d, 1));
-        }
-      }
-    }
-    
-    touchStartX.current = null;
-    touchStartY.current = null;
-  }, [isRtl]);
   const [favoriteIds, setFavoriteIds] = useState<number[]>(() => {
     try {
       const stored = localStorage.getItem('favoriteServiceIds');
@@ -1654,8 +1614,6 @@ export default function Planning() {
       ref={pageRef}
       className="h-full overflow-hidden liquid-gradient-subtle px-2 pt-1 pb-2 md:px-4 md:pt-2 md:pb-3 flex flex-col animate-fade-in"
       dir={isRtl ? "rtl" : "ltr"}
-      onTouchStart={isMobile ? handleTouchStart : undefined}
-      onTouchEnd={isMobile ? handleTouchEnd : undefined}
     >
       {/* Header - Single row */}
       <div className="mb-1 shrink-0 overflow-x-auto overflow-y-visible">
