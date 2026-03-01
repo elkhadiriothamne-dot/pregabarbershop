@@ -155,6 +155,423 @@ export async function warmupDatabase(): Promise<boolean> {
   }
 }
 
+export async function createAllMySQLTables(): Promise<void> {
+  if (dbDialect !== 'mysql') return;
+  
+  const connection = await pool.getConnection();
+  
+  const createTable = async (name: string, sql: string) => {
+    try {
+      await connection.query(sql);
+    } catch (error: any) {
+      console.error(`Failed to create table ${name}:`, error?.message || error);
+      throw error;
+    }
+  };
+
+  try {
+    await createTable('sessions', `
+      CREATE TABLE IF NOT EXISTS sessions (
+        sid VARCHAR(255) PRIMARY KEY,
+        sess JSON NOT NULL,
+        expire TIMESTAMP NOT NULL,
+        INDEX IDX_session_expire (expire)
+      )
+    `);
+
+    await createTable('users', `
+      CREATE TABLE IF NOT EXISTS users (
+        id VARCHAR(36) PRIMARY KEY,
+        email VARCHAR(255) UNIQUE,
+        first_name VARCHAR(255),
+        last_name VARCHAR(255),
+        profile_image_url VARCHAR(500),
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
+
+    await createTable('clients', `
+      CREATE TABLE IF NOT EXISTS clients (
+        id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+        name TEXT NOT NULL,
+        phone TEXT,
+        email TEXT,
+        birthday TEXT,
+        notes TEXT,
+        loyalty_points INT NOT NULL DEFAULT 0,
+        loyalty_enrolled BOOLEAN NOT NULL DEFAULT FALSE,
+        use_points BOOLEAN NOT NULL DEFAULT FALSE,
+        gift_card_balance DOUBLE NOT NULL DEFAULT 0,
+        use_gift_card_balance BOOLEAN NOT NULL DEFAULT FALSE,
+        total_visits INT NOT NULL DEFAULT 0,
+        total_spent DOUBLE NOT NULL DEFAULT 0,
+        referred_by INT,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL
+      )
+    `);
+
+    await createTable('products', `
+      CREATE TABLE IF NOT EXISTS products (
+        id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+        name VARCHAR(255) NOT NULL UNIQUE,
+        quantity INT NOT NULL DEFAULT 0,
+        low_stock_threshold INT NOT NULL DEFAULT 5,
+        expiry_date TEXT,
+        expiry_warning_days INT NOT NULL DEFAULT 30,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL
+      )
+    `);
+
+    await createTable('appointments', `
+      CREATE TABLE IF NOT EXISTS appointments (
+        id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+        date TEXT NOT NULL,
+        start_time TEXT NOT NULL,
+        duration INT NOT NULL,
+        client TEXT NOT NULL,
+        client_id INT,
+        phone TEXT,
+        service TEXT,
+        services_json TEXT,
+        staff TEXT NOT NULL,
+        staff_id INT,
+        price DOUBLE NOT NULL,
+        total DOUBLE NOT NULL,
+        paid BOOLEAN NOT NULL DEFAULT FALSE,
+        loyalty_points_earned INT DEFAULT 0,
+        loyalty_discount_amount DOUBLE DEFAULT 0,
+        loyalty_points_redeemed INT DEFAULT 0,
+        gift_card_discount_amount DOUBLE DEFAULT 0,
+        created_by TEXT,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
+
+    await createTable('services', `
+      CREATE TABLE IF NOT EXISTS services (
+        id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+        name TEXT NOT NULL,
+        price DOUBLE NOT NULL,
+        duration INT NOT NULL,
+        category TEXT NOT NULL,
+        linked_product_id INT,
+        linked_product_ids JSON DEFAULT NULL,
+        commission_percent DOUBLE NOT NULL DEFAULT 50,
+        loyalty_points_multiplier INT NOT NULL DEFAULT 1,
+        is_starting_price BOOLEAN NOT NULL DEFAULT FALSE
+      )
+    `);
+
+    await createTable('categories', `
+      CREATE TABLE IF NOT EXISTS categories (
+        id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+        name VARCHAR(255) NOT NULL UNIQUE
+      )
+    `);
+
+    await createTable('staff', `
+      CREATE TABLE IF NOT EXISTS staff (
+        id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+        name TEXT NOT NULL,
+        color TEXT NOT NULL,
+        phone TEXT,
+        email TEXT,
+        base_salary DOUBLE NOT NULL DEFAULT 0,
+        photo_url TEXT,
+        categories TEXT,
+        public_token TEXT
+      )
+    `);
+
+    await createTable('expense_categories', `
+      CREATE TABLE IF NOT EXISTS expense_categories (
+        id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+        name VARCHAR(255) NOT NULL UNIQUE,
+        color VARCHAR(50) NOT NULL DEFAULT '#6b7280'
+      )
+    `);
+
+    await createTable('charges', `
+      CREATE TABLE IF NOT EXISTS charges (
+        id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+        type TEXT NOT NULL,
+        name TEXT NOT NULL,
+        amount DOUBLE NOT NULL,
+        date TEXT NOT NULL,
+        category_id INT,
+        attachment LONGTEXT NULL DEFAULT NULL,
+        attachment_name VARCHAR(500) NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL
+      )
+    `);
+
+    await createTable('staff_deductions', `
+      CREATE TABLE IF NOT EXISTS staff_deductions (
+        id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+        staff_name TEXT NOT NULL,
+        staff_id INT,
+        type TEXT NOT NULL,
+        description TEXT NOT NULL,
+        amount DOUBLE NOT NULL,
+        date TEXT NOT NULL,
+        cleared BOOLEAN NOT NULL DEFAULT FALSE,
+        cleared_at TIMESTAMP NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL
+      )
+    `);
+
+    await createTable('loyalty_redemptions', `
+      CREATE TABLE IF NOT EXISTS loyalty_redemptions (
+        id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+        client_id INT NOT NULL,
+        points_used INT NOT NULL,
+        reward_description TEXT NOT NULL,
+        date TEXT NOT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL
+      )
+    `);
+
+    await createTable('push_subscriptions', `
+      CREATE TABLE IF NOT EXISTS push_subscriptions (
+        id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+        endpoint TEXT NOT NULL,
+        p256dh TEXT NOT NULL,
+        auth TEXT NOT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL
+      )
+    `);
+
+    await createTable('admin_roles', `
+      CREATE TABLE IF NOT EXISTS admin_roles (
+        id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+        name VARCHAR(100) NOT NULL UNIQUE,
+        role VARCHAR(50) NOT NULL DEFAULT 'receptionist',
+        pin VARCHAR(255),
+        photo_url TEXT,
+        permissions JSON NOT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL
+      )
+    `);
+
+    await createTable('business_settings', `
+      CREATE TABLE IF NOT EXISTS business_settings (
+        id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+        business_name VARCHAR(255) NOT NULL DEFAULT 'PREGA SQUAD',
+        logo TEXT,
+        address TEXT,
+        phone VARCHAR(50),
+        email VARCHAR(255),
+        currency VARCHAR(10) NOT NULL DEFAULT 'MAD',
+        currency_symbol VARCHAR(10) NOT NULL DEFAULT 'DH',
+        opening_time VARCHAR(10) NOT NULL DEFAULT '09:00',
+        closing_time VARCHAR(10) NOT NULL DEFAULT '19:00',
+        working_days JSON NOT NULL,
+        loyalty_enabled BOOLEAN NOT NULL DEFAULT TRUE,
+        loyalty_points_per_dh INT NOT NULL DEFAULT 1,
+        loyalty_points_value DOUBLE NOT NULL DEFAULT 0.1,
+        referral_bonus_points INT NOT NULL DEFAULT 100,
+        referral_bonus_referee INT NOT NULL DEFAULT 50,
+        cancellation_hours INT NOT NULL DEFAULT 24,
+        auto_lock_enabled BOOLEAN NOT NULL DEFAULT FALSE,
+        planning_shortcuts JSON,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL
+      )
+    `);
+
+    await createTable('gift_cards', `
+      CREATE TABLE IF NOT EXISTS gift_cards (
+        id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+        code VARCHAR(50) NOT NULL UNIQUE,
+        initial_balance DOUBLE NOT NULL,
+        current_balance DOUBLE NOT NULL,
+        purchased_by INT,
+        recipient_name VARCHAR(255),
+        recipient_phone VARCHAR(50),
+        expires_at TIMESTAMP NULL,
+        is_active BOOLEAN NOT NULL DEFAULT TRUE,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL
+      )
+    `);
+
+    await createTable('gift_card_transactions', `
+      CREATE TABLE IF NOT EXISTS gift_card_transactions (
+        id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+        gift_card_id INT NOT NULL,
+        appointment_id INT,
+        amount DOUBLE NOT NULL,
+        type VARCHAR(20) NOT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL
+      )
+    `);
+
+    await createTable('referrals', `
+      CREATE TABLE IF NOT EXISTS referrals (
+        id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+        referrer_id INT NOT NULL,
+        referee_id INT NOT NULL,
+        referrer_points_awarded INT NOT NULL DEFAULT 0,
+        referee_points_awarded INT NOT NULL DEFAULT 0,
+        status VARCHAR(20) NOT NULL DEFAULT 'pending',
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL
+      )
+    `);
+
+    await createTable('staff_commissions', `
+      CREATE TABLE IF NOT EXISTS staff_commissions (
+        id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+        staff_id INT NOT NULL,
+        service_id INT NOT NULL,
+        percentage DOUBLE NOT NULL DEFAULT 50,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL
+      )
+    `);
+
+    await createTable('page_views', `
+      CREATE TABLE IF NOT EXISTS page_views (
+        id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+        page_path VARCHAR(255) NOT NULL UNIQUE,
+        view_count INT NOT NULL DEFAULT 0,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL
+      )
+    `);
+
+    await createTable('packages', `
+      CREATE TABLE IF NOT EXISTS packages (
+        id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+        name VARCHAR(255) NOT NULL,
+        description TEXT,
+        services JSON NOT NULL,
+        original_price DOUBLE NOT NULL,
+        discounted_price DOUBLE NOT NULL,
+        valid_from TEXT,
+        valid_until TEXT,
+        is_active BOOLEAN NOT NULL DEFAULT TRUE,
+        max_uses_per_client INT NOT NULL DEFAULT 1,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL
+      )
+    `);
+
+    await createTable('package_purchases', `
+      CREATE TABLE IF NOT EXISTS package_purchases (
+        id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+        package_id INT NOT NULL,
+        client_id INT NOT NULL,
+        appointment_id INT,
+        purchase_date TEXT NOT NULL,
+        used_count INT NOT NULL DEFAULT 0,
+        max_uses INT NOT NULL DEFAULT 1,
+        status VARCHAR(20) NOT NULL DEFAULT 'active',
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL
+      )
+    `);
+
+    await createTable('waitlist', `
+      CREATE TABLE IF NOT EXISTS waitlist (
+        id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+        client_id INT,
+        client_name TEXT NOT NULL,
+        client_phone TEXT,
+        requested_date TEXT NOT NULL,
+        requested_time TEXT,
+        service_ids JSON DEFAULT NULL,
+        services_description TEXT,
+        staff_id INT,
+        staff_name TEXT,
+        status VARCHAR(20) NOT NULL DEFAULT 'waiting',
+        notified_at TIMESTAMP NULL,
+        expires_at TIMESTAMP NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL
+      )
+    `);
+
+    await createTable('staff_schedules', `
+      CREATE TABLE IF NOT EXISTS staff_schedules (
+        id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+        staff_id INT NOT NULL,
+        day_of_week INT NOT NULL,
+        start_time VARCHAR(10) NOT NULL,
+        end_time VARCHAR(10) NOT NULL,
+        is_active BOOLEAN NOT NULL DEFAULT TRUE,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL
+      )
+    `);
+
+    await createTable('staff_breaks', `
+      CREATE TABLE IF NOT EXISTS staff_breaks (
+        id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+        staff_id INT NOT NULL,
+        date TEXT NOT NULL,
+        start_time VARCHAR(10) NOT NULL,
+        end_time VARCHAR(10) NOT NULL,
+        reason TEXT,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL
+      )
+    `);
+
+    await createTable('staff_time_off', `
+      CREATE TABLE IF NOT EXISTS staff_time_off (
+        id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+        staff_id INT NOT NULL,
+        start_date TEXT NOT NULL,
+        end_date TEXT NOT NULL,
+        reason TEXT,
+        status VARCHAR(20) NOT NULL DEFAULT 'pending',
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL
+      )
+    `);
+
+    await createTable('staff_goals', `
+      CREATE TABLE IF NOT EXISTS staff_goals (
+        id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+        staff_id INT NOT NULL,
+        period VARCHAR(7) NOT NULL,
+        revenue_target DOUBLE NOT NULL DEFAULT 0,
+        appointments_target INT NOT NULL DEFAULT 0,
+        commission_target DOUBLE NOT NULL DEFAULT 0,
+        actual_revenue DOUBLE NOT NULL DEFAULT 0,
+        actual_appointments INT NOT NULL DEFAULT 0,
+        actual_commission DOUBLE NOT NULL DEFAULT 0,
+        bonus_percentage DOUBLE NOT NULL DEFAULT 5,
+        bonus_amount DOUBLE NOT NULL DEFAULT 0,
+        status VARCHAR(20) NOT NULL DEFAULT 'active',
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL
+      )
+    `);
+
+    await createTable('message_templates', `
+      CREATE TABLE IF NOT EXISTS message_templates (
+        id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+        name VARCHAR(255) NOT NULL,
+        content TEXT NOT NULL,
+        category VARCHAR(100) DEFAULT 'general',
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL
+      )
+    `);
+
+    await createTable('staff_payments', `
+      CREATE TABLE IF NOT EXISTS staff_payments (
+        id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+        staff_id INT NOT NULL,
+        staff_name TEXT NOT NULL,
+        amount DOUBLE NOT NULL,
+        paid_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL
+      )
+    `);
+
+    connection.release();
+    console.log("All MySQL tables created/verified");
+  } catch (error) {
+    connection.release();
+    console.error("Failed to create MySQL tables:", error);
+    throw error;
+  }
+}
+
 export async function ensurePushSubscriptionsTable(): Promise<void> {
   try {
     if (dbDialect === 'mysql') {

@@ -23,8 +23,16 @@ Beauty Salon Appointment Management System built with React + Express + PostgreS
 - `npm run db:push` - Push schema to database
 
 ## Environment
-- `DATABASE_URL` - PostgreSQL connection string (auto-configured by Replit)
+- `DATABASE_URL` - PostgreSQL connection string (auto-configured by Replit, used in development)
+- `MYSQL_URL` - MySQL/TiDB connection string (used in production)
+- `DB_DIALECT` - `postgres` (development) or `mysql` (production)
 - Port 5000 for the application
+
+## Database Dual-Dialect Support
+- **Development**: PostgreSQL via `DATABASE_URL`
+- **Production**: MySQL/TiDB via `MYSQL_URL`
+- Schema files: `shared/schema/postgres.ts` and `shared/schema/mysql.ts`
+- `server/db.ts` contains `createAllMySQLTables()` which creates all tables with `CREATE TABLE IF NOT EXISTS` on MySQL startup, followed by ensure functions that add/modify columns
 
 ## Architecture Notes
 - **Staff relationships**: appointments and staff_deductions use `staffId` (integer) for staff association, with `staff`/`staffName` kept as display names for backward compatibility
