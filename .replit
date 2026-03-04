@@ -44,6 +44,8 @@ build = ["npm", "run", "build"]
 MYSQL_URL = "mysql://4Z83gm4jWEPBDuP.root:mQNGJqH5Bl5cLYKA@gateway01.eu-central-1.prod.aws.tidbcloud.com:4000/test?ssl={\"rejectUnauthorized\":true}"
 SUPABASE_URL = "https://rkarkdlitfexwpjlalgb.supabase.co/"
 SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJrYXJrZGxpdGZleHdwamxhbGdiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA1NzI1MjUsImV4cCI6MjA4NjE0ODUyNX0.6xKg14IW9AOjHnN9Y_x_yDljYieUZ3FXAhPKddAW6k0"
+VAPID_PUBLIC_KEY = "BNeszXvnQ8l0dTz3BrIntP42qmXY6h1kXrW8n6zu4YnCKhx9a8VmD8ohckWGFplC4x_bkAqc1SDsar3qqbhmHQE"
+VAPID_PRIVATE_KEY = "Ue4B_rNnHrFm3ACDwrxoF9vrubfrEZAV_qjTnCctFME"
 
 [userenv.development]
 DB_DIALECT = "postgres"
