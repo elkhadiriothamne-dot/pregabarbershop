@@ -1,7 +1,7 @@
 import { useAppointments, useStaff, useServices, useClients, useCategories, useBusinessSettings } from "@/hooks/use-salon-data";
 import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Users, Scissors, CalendarCheck, TrendingUp, Clock, Package, UserPlus, Pencil, Trash2, LogOut, AlertTriangle, Banknote, CreditCard, RefreshCw, ClipboardCheck, CheckCircle2, XCircle, CircleDot, ArrowUpRight, ArrowDownRight, Minus } from "lucide-react";
+import { Users, Scissors, CalendarCheck, TrendingUp, Clock, Package, UserPlus, Pencil, Trash2, LogOut, AlertTriangle, Banknote, CreditCard, RefreshCw, ClipboardCheck, CheckCircle2, XCircle, CircleDot, Minus } from "lucide-react";
 import { format, startOfToday, subDays } from "date-fns";
 import { useState, useMemo } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -208,14 +208,6 @@ export default function Home() {
     return { totalRevenue, paidRevenue, unpaidRevenue, totalCommissions, count: appointments.length };
   }, [appointments, services, staff, staffCommissions]);
 
-  const todayExpenses = useMemo(() => {
-    const todayCharges = charges.filter((c: any) => c.date === todayDate);
-    return todayCharges.reduce((sum: number, c: any) => sum + (c.amount || 0), 0);
-  }, [charges, todayDate]);
-
-  const salonPortion = todayStats.totalRevenue - todayStats.totalCommissions;
-  const netProfit = salonPortion - todayExpenses;
-
   const closingChecklist = useMemo(() => {
     const unpaidCount = appointments.filter((app: any) => !app.paid).length;
     const hasAppointments = appointments.length > 0;
@@ -305,48 +297,6 @@ export default function Home() {
               <span className="text-sm font-medium text-muted-foreground ms-1">DH</span>
             </div>
           </div>
-        </div>
-
-        <div data-testid="section-financial">
-          <h2 className="text-[10px] font-bold uppercase tracking-[0.15em] text-muted-foreground mb-3">{t("home.financialOverview")}</h2>
-          <Card className="overflow-visible">
-            <CardContent className="p-0">
-              <div className="p-4 flex items-center justify-between gap-3">
-                <div className="flex items-center gap-2.5">
-                  <div className="w-8 h-8 rounded-lg bg-emerald-100 dark:bg-emerald-900/40 flex items-center justify-center">
-                    <ArrowUpRight className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
-                  </div>
-                  <div>
-                    <p className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground">{t("home.salonRevenue")}</p>
-                    <p className="text-lg font-bold text-emerald-600 dark:text-emerald-400" data-testid="text-salon-revenue">{todayStats.totalRevenue} DH</p>
-                  </div>
-                </div>
-              </div>
-
-              <div className="border-t border-border/50" />
-
-              <div className="p-4 flex items-center justify-between gap-3">
-                <div className="flex items-center gap-2.5">
-                  <div className="w-8 h-8 rounded-lg bg-red-100 dark:bg-red-900/40 flex items-center justify-center">
-                    <ArrowDownRight className="w-4 h-4 text-red-600 dark:text-red-400" />
-                  </div>
-                  <div>
-                    <p className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground">{t("home.expenses")}</p>
-                    <p className="text-lg font-bold text-red-600 dark:text-red-400" data-testid="text-expenses">{todayExpenses} DH</p>
-                  </div>
-                </div>
-              </div>
-
-              <div className="border-t border-border/50" />
-
-              <div className="p-5 flex flex-col items-center justify-center">
-                <p className="text-[10px] font-bold uppercase tracking-[0.15em] text-muted-foreground mb-1">{t("home.netProfit")}</p>
-                <p className={`text-3xl font-extrabold tracking-tight ${netProfit >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-600 dark:text-red-400'}`} data-testid="text-net-profit">
-                  {netProfit >= 0 ? '+' : ''}{netProfit} DH
-                </p>
-              </div>
-            </CardContent>
-          </Card>
         </div>
 
         <div data-testid="section-team-performance">
