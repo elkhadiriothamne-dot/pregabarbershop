@@ -2642,51 +2642,43 @@ export default function Planning() {
                     name="service"
                     render={({ field }) => (
                       <FormItem className="space-y-0">
-                        <Popover open={servicePopoverOpen} onOpenChange={setServicePopoverOpen}>
-                          <PopoverTrigger asChild>
-                            <FormControl>
-                              <Button variant="outline" role="combobox" className="h-10 w-full justify-between rounded-xl text-sm font-medium border border-dashed border-primary/40 bg-primary/5 dark:bg-primary/10 hover:bg-primary/10 dark:hover:bg-primary/15 transition-colors">
-                                <span className="flex items-center gap-2 text-primary">
-                                  <div className="w-6 h-6 rounded-full bg-primary/15 flex items-center justify-center shrink-0">
-                                    <Plus className="w-3.5 h-3.5" />
-                                  </div>
-                                  {t("planning.addService")}
-                                </span>
-                                <Search className="h-4 w-4 shrink-0 text-primary/40" />
-                              </Button>
-                            </FormControl>
-                          </PopoverTrigger>
-                          <PopoverContent 
-                            className="w-[calc(100vw-48px)] max-w-[376px] p-0 rounded-xl glass-card shadow-2xl z-[200]" 
-                            align="center" 
-                            side="top" 
-                            sideOffset={4}
-                            onWheel={(e) => e.stopPropagation()}
-                            onTouchMove={(e) => e.stopPropagation()}
+                        <FormControl>
+                          <Button
+                            type="button"
+                            variant="outline"
+                            className="h-10 w-full justify-between rounded-xl text-sm font-medium border border-dashed border-primary/40 bg-primary/5 dark:bg-primary/10 hover:bg-primary/10 dark:hover:bg-primary/15 transition-colors"
+                            onClick={() => setServicePopoverOpen(!servicePopoverOpen)}
                           >
-                            <div className="p-2 border-b border-white/20 liquid-gradient-subtle rounded-t-xl">
+                            <span className="flex items-center gap-2 text-primary">
+                              <div className="w-6 h-6 rounded-full bg-primary/15 flex items-center justify-center shrink-0">
+                                <Plus className="w-3.5 h-3.5" />
+                              </div>
+                              {t("planning.addService")}
+                            </span>
+                            <Search className="h-4 w-4 shrink-0 text-primary/40" />
+                          </Button>
+                        </FormControl>
+                        {servicePopoverOpen && (
+                          <div className="mt-1.5 rounded-xl border border-border/60 bg-background shadow-lg overflow-hidden">
+                            <div className="p-2 border-b border-border/40">
                               <Input
                                 placeholder={t("planning.searchService")}
                                 value={serviceSearch}
                                 onChange={(e) => setServiceSearch(e.target.value)}
-                                className="h-9 text-sm rounded-lg border-0 bg-white/80 dark:bg-slate-800/80"
+                                className="h-9 text-sm rounded-lg border-0 bg-secondary/50"
+                                autoFocus
                               />
                             </div>
-                            <div 
-                              className="max-h-[40vh] overflow-y-auto p-1.5"
-                              style={{ WebkitOverflowScrolling: 'touch', overscrollBehavior: 'contain', touchAction: 'pan-y' }}
-                              onWheel={(e) => { e.stopPropagation(); }}
-                              onTouchMove={(e) => e.stopPropagation()}
-                            >
+                            <div className="max-h-[35vh] overflow-y-auto p-1.5" style={{ WebkitOverflowScrolling: 'touch', overscrollBehavior: 'contain' }}>
                               {Object.entries(groupedServices).map(([category, categoryServices]) => (
                                 <div key={category}>
-                                  <div className="px-2 py-1 text-[10px] font-bold gradient-text uppercase glass-subtle rounded-md mb-0.5 sticky top-0">{category}</div>
+                                  <div className="px-2 py-1 text-[10px] font-bold gradient-text uppercase glass-subtle rounded-md mb-0.5 sticky top-0 bg-background z-10">{category}</div>
                                   {categoryServices.map(s => (
                                     <div
                                       key={s.id}
                                       className={cn(
                                         "flex items-center justify-between gap-2 px-2 py-2 rounded-lg cursor-pointer text-xs mb-0.5 transition-all",
-                                        "hover:bg-primary/5 dark:hover:bg-primary/10",
+                                        "hover:bg-primary/5 dark:hover:bg-primary/10 active:bg-primary/15",
                                         selectedServices.some(sel => sel.name === s.name) && "bg-primary/10 dark:bg-primary/20"
                                       )}
                                       onClick={() => { handleServiceChange(s.name); setServiceSearch(""); setServicePopoverOpen(false); }}
@@ -2701,8 +2693,8 @@ export default function Planning() {
                                 </div>
                               ))}
                             </div>
-                          </PopoverContent>
-                        </Popover>
+                          </div>
+                        )}
                       </FormItem>
                     )}
                   />
