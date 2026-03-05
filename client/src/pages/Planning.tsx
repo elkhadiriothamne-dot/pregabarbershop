@@ -2657,11 +2657,12 @@ export default function Planning() {
                             </FormControl>
                           </PopoverTrigger>
                           <PopoverContent 
-                            className="w-[calc(100vw-48px)] max-w-[376px] p-0 rounded-xl glass-card shadow-2xl" 
+                            className="w-[calc(100vw-48px)] max-w-[376px] p-0 rounded-xl glass-card shadow-2xl z-[200]" 
                             align="center" 
                             side="top" 
                             sideOffset={4}
                             onWheel={(e) => e.stopPropagation()}
+                            onTouchMove={(e) => e.stopPropagation()}
                           >
                             <div className="p-2 border-b border-white/20 liquid-gradient-subtle rounded-t-xl">
                               <Input
@@ -2672,9 +2673,9 @@ export default function Planning() {
                               />
                             </div>
                             <div 
-                              className="max-h-[180px] overflow-y-auto p-1.5"
-                              style={{ WebkitOverflowScrolling: 'touch', overscrollBehavior: 'contain' }}
-                              onWheel={(e) => { e.stopPropagation(); e.currentTarget.scrollTop += e.deltaY; }}
+                              className="max-h-[40vh] overflow-y-auto p-1.5"
+                              style={{ WebkitOverflowScrolling: 'touch', overscrollBehavior: 'contain', touchAction: 'pan-y' }}
+                              onWheel={(e) => { e.stopPropagation(); }}
                               onTouchMove={(e) => e.stopPropagation()}
                             >
                               {Object.entries(groupedServices).map(([category, categoryServices]) => (
